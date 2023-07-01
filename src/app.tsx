@@ -6,14 +6,14 @@ import { useFileInput } from '@lib/useFileInput'
 
 export function App() {
   const { jsonData, handleFileInputChange } = useFileInput()
-  const { tableValues, total } = parseTable(jsonData)
+  const tableValuesByMonth = parseTable(jsonData as any)
 
   return (
     <div className="table-info">
-      {!jsonData || !tableValues ? (
+      {!jsonData || !tableValuesByMonth ? (
         <input type="file" accept=".csv" onChange={handleFileInputChange} />
       ) : (
-        <Table data={tableValues} total={total} />
+        <Table data={tableValuesByMonth} />
       )}
     </div>
   )
