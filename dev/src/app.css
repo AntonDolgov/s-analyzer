@@ -47,6 +47,14 @@
   padding: 10px;
   text-align: left;
   border-bottom: 1px solid #ddd;
+
+  &:first-child {
+    width: 75%;
+  }
+
+  &:last-child {
+    width: 25%;
+  }
 }
 
 .table tfoot {
