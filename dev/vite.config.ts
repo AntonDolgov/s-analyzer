@@ -7,5 +7,6 @@ export default defineConfig({
   plugins: [preact(), tsConfigPaths()],
   build: {
     outDir: '../',
+    assetsDir: '',
   },
 })
