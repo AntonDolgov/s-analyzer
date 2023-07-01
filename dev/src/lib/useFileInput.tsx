@@ -9,6 +9,9 @@ export const useFileInput = () => {
   const handleFileInputChange = async (
     event: ChangeEvent<HTMLInputElement>,
   ) => {
+    if (!(event.target instanceof HTMLInputElement)) return
+    if (!event.target.files) return
+
     const file = event.target?.files[0]
     const reader = new FileReader()
 
