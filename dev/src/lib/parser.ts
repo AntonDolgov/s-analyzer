@@ -2,36 +2,37 @@ import { groupBy } from '@lib/groupBy'
 import { convertStringToNumber } from './convertStringToNumber'
 import { roundNumber } from './roundNumber'
 import { getMonthString, parseDate } from './parseDate'
-
-interface Data {
-  Kirjauspäivä: string
-  Maksupäivä: string
-  Summa: string | number | undefined
-  Tapahtumalaji: string
-  Maksaja: string
-  'Saajan nimi': string
-  'Saajan tilinumero': string
-  'Saajan BIC-tunnus': string
-  Viitenumero: string
-  Viesti: string
-  Arkistointitunnus: string
-}
+import { Data } from './types'
+import { getFieldByLang } from './checkLang'
 
 export const parseTable = (data: Data[] | null) => {
   if (!data) return {}
 
   const groupedDataByMonth = groupBy(
-    data.filter(({ Summa }) => Summa !== null && Summa !== undefined),
-    (item) => getMonthString(parseDate(item['Maksupäivä']).getMonth() + 1),
+    data.filter((item) => {
+      const amount = 'Summa' in item ? item.Summa : item.Belopp
+
+      return amount !== null && amount !== undefined
+    }),
+    (item) => {
+      const date =
+        'Maksupäivä' in item ? item['Maksupäivä'] : item.Betalningsdag
+
+      return getMonthString(parseDate(date).getMonth() + 1)
+    },
   )
 
   return Object.entries(groupedDataByMonth).reduce((acc, [month, data]) => {
-    const groupedData = groupBy(data, 'Saajan nimi')
+    const groupFieldName = getFieldByLang(data, 'recipientName')
+
+    if (!groupFieldName) throw new Error('groupFieldName is not defined')
+
+    const groupedData = groupBy(data, groupFieldName)
     const tableInfo = Object.entries(groupedData).reduce<
       Record<string, number>
     >((acc, [key, valuesList]) => {
       const totalSumOfCategory = valuesList.reduce((sum, current) => {
-        const summaValue = current.Summa
+        const summaValue = 'Summa' in current ? current.Summa : current.Belopp
 
         if (!summaValue) return sum
 
